@@ -120,6 +120,23 @@ module.exports = function(grunt) {
             }
           }
         ]
+      },
+      wsrequest: {
+        options: {
+          port: 8082,
+          middleware: function (connect, options) {
+            return [require('./lib/utils').proxyRequest];
+          }
+        },
+        proxies: [
+          {
+            context: '/ws',
+            host: 'localhost',
+            port: 8090,
+            ws: true,
+            https: false
+          }
+        ]
       }
     },
 
@@ -129,7 +146,8 @@ module.exports = function(grunt) {
       server2: 'test/server2_proxy_test.js',
       server3: 'test/server3_proxy_test.js',
       utils: 'test/utils_test.js',
-      request: 'test/request_test.js'
+      request: 'test/request_test.js',
+      wsrequest: 'test/ws_request_test.js'
     }
 
   });
@@ -156,7 +174,10 @@ module.exports = function(grunt) {
     'nodeunit:server3',
     'configureProxies:request',
     'connect:request',
-    'nodeunit:request'
+    'nodeunit:request',
+    'configureProxies:wsrequest',
+    'connect:wsrequest',
+    'nodeunit:wsrequest'
     ]);
 
   // specifically test that option inheritance works for multi-level config
